@@ -4,7 +4,7 @@
 
 ---
 
-🌐 **Live at:** [https://lyrais.online](https://lyrais.online)
+🌐 **Live at:** [lyrais.online](https://lyrais.online)
 
 ---
 
