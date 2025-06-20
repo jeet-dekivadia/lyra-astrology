@@ -71,7 +71,7 @@ function hashLocationToLatLng(location: string) {
 const OnboardingFlow: React.FC = () => {
   const navigate = useNavigate();
   const { signUp, setGuestMode } = useAuth();
-  const { setBirthData, setSelectedPersona } = useUser();
+  const { setBirthData, setSelectedPersona, setName } = useUser();
   
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -101,6 +101,7 @@ const OnboardingFlow: React.FC = () => {
       }
       return next;
     });
+    if (field === 'name') setName(value);
     setStarTrigger(t => t + 1);
   };
 
