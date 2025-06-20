@@ -9,6 +9,7 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('home');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [billing, setBilling] = useState<'monthly' | 'annually'>("monthly");
 
   const beltRef = useRef<HTMLDivElement>(null);
   const beltScrollRef = useRef<number>(0);
@@ -129,6 +130,22 @@ const LandingPage: React.FC = () => {
     'Progressions',
     'Returns',
   ];
+
+  // Replace ChevronArrow with a pixel-art style arrow
+  const PixelArrow = ({ open }: { open: boolean }) => (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      className={`transition-transform duration-300 ${open ? 'rotate-90' : 'rotate-0'}`}
+      style={{ imageRendering: 'pixelated' }}
+    >
+      {/* Pixel right arrow (closed) and rotates down (open) */}
+      <rect x="6" y="11" width="10" height="2" fill="#FF6F1F" />
+      <rect x="14" y="7" width="2" height="10" fill="#FF6F1F" />
+    </svg>
+  );
 
   return (
     <div className="min-h-screen">
@@ -273,102 +290,62 @@ const LandingPage: React.FC = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* GPT-4o Card */}
-            <motion.div 
-              className="col-span-1 md:col-span-2 bg-gradient-to-br from-orange-200 to-orange-300 rounded-3xl p-8 h-64"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <div className="h-full flex flex-col justify-between">
-                <div>
-                  <p className="text-sm font-medium text-black mb-2">gpt-4o-mini</p>
-                  <h3 className="text-3xl font-bold text-black leading-tight">ElevenLabs and Tavus</h3>
-                </div>
-                <div className="w-12 h-12 bg-white/30 rounded-lg flex items-center justify-center">
-                  <span className="text-2xl">🧠</span>
-                </div>
+          {/* Strict 3x2 grid of feature cards, no empty spaces, all cards same size */}
+          <div className="grid grid-cols-1 md:grid-cols-3 grid-rows-6 md:grid-rows-2 gap-8">
+            {/* Tavus (formerly ElevenLabs/OpenAI/Tavus) */}
+            <div className="rounded-3xl shadow-lg p-8 bg-gradient-to-br from-orange-100 to-orange-300 flex flex-col items-center justify-center">
+              <img src="https://raw.githubusercontent.com/konfig-sdks/openapi-examples/HEAD/tavus/logo.png" alt="Tavus" className="max-w-[60%] max-h-[60px] object-contain mb-4" />
+              <div className="text-xs text-gray-700 mb-1">gpt-4o-mini</div>
+              <div className="text-xl font-bold text-black mb-1 text-center">ElevenLabs, Tavus & OpenAI</div>
+              <div className="text-black text-sm text-center">Voice, video, and AI chat—seamlessly integrated for your cosmic journey.</div>
+            </div>
+            {/* RevenueCat */}
+            <div className="rounded-3xl shadow-lg p-8 bg-white flex flex-col items-center justify-center">
+              <img src="https://www.revenuecat.com/static/logo-10968976818e28fd8eee91f66d535d9a.svg" alt="RevenueCat" className="max-w-[60%] max-h-[60px] object-contain mb-4" />
+              <div className="text-black font-medium mb-1 text-center">Premium features available at just 9.99 per month</div>
+              <div className="text-xs text-gray-500 text-center">Keep your mental health stable and pockets filled</div>
+            </div>
+            {/* Custom SVG Natal Chart */}
+            <div className="rounded-3xl shadow-lg p-8 bg-gradient-to-br from-orange-100 to-orange-200 flex flex-col items-center justify-center">
+              <svg width="60" height="60" viewBox="0 0 48 48" fill="none" className="mb-3"><circle cx="24" cy="24" r="22" stroke="#FF6F1F" strokeWidth="4" fill="#fff"/><path d="M24 2v44M2 24h44" stroke="#FF6F1F" strokeWidth="2"/><circle cx="24" cy="24" r="8" fill="#FF6F1F"/></svg>
+              <span className="text-lg font-bold text-black mb-1 text-center">Your Custom Natal Chart</span>
+              <div className="text-black text-sm text-center">Every user gets a unique SVG natal chart—the basis of Lyra's therapy and predictions.</div>
+            </div>
+            {/* Chat Preview */}
+            <div className="rounded-3xl shadow-lg p-8 bg-black flex flex-col items-center justify-center">
+              <div className="mb-4 w-full">
+                <div className="text-xs text-gray-400 mb-2">User</div>
+                <div className="bg-gray-800 text-white rounded-lg px-4 py-2 mb-2 w-fit mx-auto">I really feel lonely. Will I ever become happy?</div>
+                <div className="text-xs text-orange-300 mb-2">Lyra</div>
+                <div className="bg-orange-500 text-white rounded-lg px-4 py-2 mb-2 w-fit mx-auto">Your moon sign is soon transitioning. Just in a few days a magical person will come in your life!</div>
               </div>
-            </motion.div>
-
-            {/* Stripe Card */}
-            <motion.div 
-              className="bg-white rounded-3xl p-8 h-64 flex flex-col justify-center items-center text-center"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              viewport={{ once: true }}
-            >
-              <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-4">
-                <span className="text-white text-2xl font-bold">$</span>
-              </div>
-              <p className="text-sm text-gray-600 mb-2">stripe</p>
-              <p className="text-black font-medium">Premium features available at just 9.99 per month</p>
-            </motion.div>
-
-            {/* Orange Placeholder */}
-            <motion.div 
-              className="bg-primary-orange rounded-3xl h-64"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              viewport={{ once: true }}
-            />
-
-            {/* Three Guides Card */}
-            <motion.div 
-              className="col-span-1 md:col-span-2 bg-white rounded-3xl p-8 h-64"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              viewport={{ once: true }}
-            >
-              <h3 className="text-2xl font-bold text-black mb-2">Three Guides in One</h3>
-              <p className="text-gray-600 mb-6">Astrologer, Therapist, Friend</p>
-              <div className="flex space-x-6">
-                {[
-                  { name: 'Astrologer', tag: 'Wise', emoji: '🔮' },
-                  { name: 'Therapist', tag: 'Caring', emoji: '💙' },
-                  { name: 'Friend', tag: 'Fun', emoji: '✨' }
-                ].map((persona, i) => (
-                  <div key={i} className="text-center">
-                    <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mb-2">
-                      <span className="text-xl">{persona.emoji}</span>
-                    </div>
-                    <p className="text-xs font-medium text-black">{persona.name}</p>
-                    <span className="text-xs bg-orange-200 px-2 py-1 rounded-full text-black">{persona.tag}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Chat Preview Card */}
-            <motion.div 
-              className="col-span-1 md:col-span-2 bg-black rounded-3xl p-6 h-64 flex flex-col justify-between"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <div className="space-y-4">
-                <div className="bg-gray-800 rounded-2xl p-4 max-w-xs">
-                  <p className="text-white text-sm">I really feel lonely. Will I ever become happy?</p>
+              <button className="bg-orange-500 text-white rounded-full px-6 py-2 font-bold w-fit self-end mt-2">Try Lyra Today</button>
+              <div className="text-xs text-gray-400 mt-2 text-center">Life really changes after Lyra</div>
+            </div>
+            {/* Three Guides in One (merged large card, spans two columns) */}
+            <div className="rounded-3xl shadow-lg p-8 bg-white flex flex-col items-center justify-center md:col-span-2">
+              <span className="text-2xl font-bold text-black mb-4">Three Guides in One</span>
+              <div className="flex flex-row w-full justify-center gap-8">
+                <div className="flex flex-col items-center bg-orange-50 rounded-2xl p-4 flex-1 mx-2">
+                  <span className="text-3xl mb-2">🔮</span>
+                  <span className="text-base font-bold text-black mb-1">Astrologer</span>
+                  <span className="text-xs bg-orange-100 px-3 py-1 rounded-full mb-1">Insightful</span>
+                  <span className="text-xs text-gray-500 text-center">Personalized cosmic insights</span>
                 </div>
-                <div className="bg-primary-orange rounded-2xl p-4 max-w-xs ml-auto">
-                  <p className="text-black text-sm">Your moon sign is soon transitioning. Just in a few days a magical function will come in your life!</p>
+                <div className="flex flex-col items-center bg-blue-50 rounded-2xl p-4 flex-1 mx-2">
+                  <span className="text-3xl mb-2">💙</span>
+                  <span className="text-base font-bold text-black mb-1">Therapist</span>
+                  <span className="text-xs bg-blue-100 px-3 py-1 rounded-full mb-1">Supportive</span>
+                  <span className="text-xs text-gray-500 text-center">Emotional guidance & care</span>
+                </div>
+                <div className="flex flex-col items-center bg-yellow-50 rounded-2xl p-4 flex-1 mx-2">
+                  <span className="text-3xl mb-2">✨</span>
+                  <span className="text-base font-bold text-black mb-1">Friend</span>
+                  <span className="text-xs bg-yellow-100 px-3 py-1 rounded-full mb-1">Empowering</span>
+                  <span className="text-xs text-gray-500 text-center">Motivation & encouragement</span>
                 </div>
               </div>
-              <div className="text-center">
-                <button 
-                  onClick={() => navigate('/onboarding')}
-                  className="bg-primary-orange text-black px-6 py-2 rounded-full font-medium hover:shadow-lg transition-all duration-300"
-                >
-                  Try Lyra Today
-                </button>
-              </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -377,22 +354,38 @@ const LandingPage: React.FC = () => {
       <section id="pricing" className="py-24 bg-gradient-to-b from-black to-primary-orange">
         <div className="max-w-4xl mx-auto px-8">
           <motion.div 
-            className="text-center mb-16"
+            className="text-center mb-10"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-6xl md:text-7xl font-black text-white mb-4 leading-tight">
-              Memberships levels
+            <h2 className="text-4xl md:text-5xl font-pixel text-white mb-4 leading-tight tracking-wider">
+              Membership levels
             </h2>
             <p className="text-xl text-white">Choose a plan that's right for you.</p>
           </motion.div>
-
+          {/* Toggle */}
+          <div className="flex justify-center mb-10">
+            <div className="bg-gray-800 rounded-full flex p-1 border-2 border-orange-400 shadow-inner">
+              <button
+                className={`px-6 py-2 rounded-full text-sm transition-all duration-200 ${billing === 'monthly' ? 'bg-primary-orange text-black shadow' : 'text-white hover:text-primary-orange'}`}
+                onClick={() => setBilling('monthly')}
+              >
+                monthly
+              </button>
+              <button
+                className={`px-6 py-2 rounded-full text-sm transition-all duration-200 ${billing === 'annually' ? 'bg-primary-orange text-black shadow' : 'text-white hover:text-primary-orange'}`}
+                onClick={() => setBilling('annually')}
+              >
+                annually <span className="ml-1 text-xs font-bold">(save 25%)</span>
+              </button>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Free Plan */}
             <motion.div 
-              className="bg-gray-900 rounded-3xl p-8 h-96 flex flex-col justify-between"
+              className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 h-96 flex flex-col justify-between shadow-xl hover:scale-[1.03] transition-transform duration-300"
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
@@ -401,8 +394,8 @@ const LandingPage: React.FC = () => {
               <div>
                 <p className="text-white text-sm mb-2">free</p>
                 <div className="flex items-baseline mb-6">
-                  <span className="text-5xl font-bold text-white">$0</span>
-                  <span className="text-xl text-white">/m</span>
+                  <span className="text-5xl font-black text-white">$0</span>
+                  <span className="text-xl text-white">/{billing === 'monthly' ? 'm' : 'year'}</span>
                   <span className="text-sm text-gray-400 ml-2">USD</span>
                 </div>
                 <p className="text-white text-sm leading-relaxed">
@@ -411,26 +404,27 @@ const LandingPage: React.FC = () => {
               </div>
               <button 
                 onClick={() => navigate('/onboarding')}
-                className="bg-primary-orange text-black px-6 py-3 rounded-xl font-medium flex items-center justify-center space-x-2 hover:shadow-lg transition-all duration-300"
+                className="bg-primary-orange text-black px-6 py-3 rounded-xl font-bold flex items-center justify-center space-x-2 hover:shadow-lg transition-all duration-300"
               >
                 <span>start</span>
-                <span>↗</span>
+                <span className="text-lg">↗</span>
               </button>
             </motion.div>
-
             {/* Premium Plan */}
             <motion.div 
-              className="bg-primary-orange rounded-3xl p-8 h-96 flex flex-col justify-between"
+              className="bg-gradient-to-br from-orange-400 to-orange-600 rounded-3xl p-8 h-96 flex flex-col justify-between shadow-xl hover:scale-[1.03] transition-transform duration-300 relative"
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
+              {/* Most Popular badge */}
+              <span className="absolute top-6 right-6 bg-black text-primary-orange text-xs px-3 py-1 rounded-full shadow">most popular</span>
               <div>
                 <p className="text-black text-sm mb-2">cosmic +</p>
                 <div className="flex items-baseline mb-6">
-                  <span className="text-5xl font-bold text-black">$9.99</span>
-                  <span className="text-xl text-black">/m</span>
+                  <span className="text-5xl font-black text-black">{billing === 'monthly' ? '$9.99' : '$90'}</span>
+                  <span className="text-xl text-black">/{billing === 'monthly' ? 'm' : 'year'}</span>
                   <span className="text-sm text-gray-800 ml-2">USD</span>
                 </div>
                 <p className="text-black text-sm leading-relaxed">
@@ -439,10 +433,10 @@ const LandingPage: React.FC = () => {
               </div>
               <button 
                 onClick={() => window.open('https://www.revenuecat.com/404', '_blank')}
-                className="bg-black text-white px-6 py-3 rounded-xl font-medium flex items-center justify-center space-x-2 hover:shadow-lg transition-all duration-300"
+                className="bg-black text-primary-orange px-6 py-3 rounded-xl font-bold flex items-center justify-center space-x-2 hover:shadow-lg transition-all duration-300"
               >
                 <span>invest for your future</span>
-                <span>↗</span>
+                <span className="text-lg">↗</span>
               </button>
             </motion.div>
           </div>
@@ -478,21 +472,24 @@ const LandingPage: React.FC = () => {
                   onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
                 >
                   <span className="text-lg font-medium">{faq.question}</span>
-                  <div className="w-8 h-8 border border-white rounded flex items-center justify-center">
-                    <span className="text-sm">↗</span>
-                  </div>
+                  <span className="ml-4 flex items-center">
+                    <PixelArrow open={expandedFaq === index} />
+                  </span>
                 </button>
-                {expandedFaq === index && (
-                  <motion.div
-                    className="px-6 pb-6"
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
-                  </motion.div>
-                )}
+                <motion.div
+                  initial={false}
+                  animate={expandedFaq === index ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  {expandedFaq === index && (
+                    <div className="px-6 pb-6">
+                      <div className="bg-gray-800/80 rounded-xl p-6 mt-2">
+                        <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
               </motion.div>
             ))}
           </div>
