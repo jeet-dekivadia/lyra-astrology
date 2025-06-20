@@ -21,6 +21,8 @@ interface UserContextType {
     video: number;
   };
   incrementUsage: (type: 'chat' | 'voice' | 'video') => void;
+  name: string;
+  setName: (name: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -42,6 +44,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     voice: 0,
     video: 0
   });
+  const [name, setName] = useState('');
 
   const incrementUsage = (type: 'chat' | 'voice' | 'video') => {
     setUsageCount(prev => ({
@@ -59,7 +62,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       chatHistory,
       setChatHistory,
       usageCount,
-      incrementUsage
+      incrementUsage,
+      name,
+      setName
     }}>
       {children}
     </UserContext.Provider>
