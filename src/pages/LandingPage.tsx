@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import FloatingBlobs from '../components/FloatingBlobs';
@@ -9,6 +9,11 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('home');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+
+  const beltRef = useRef<HTMLDivElement>(null);
+  const beltScrollRef = useRef<number>(0);
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+  const animating = useRef<boolean>(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,6 +32,55 @@ const LandingPage: React.FC = () => {
       }
     };
 
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const belt = beltRef.current;
+    if (belt) {
+      // Set initial transform
+      belt.style.transform = `rotate(-8deg) translateX(0px)`;
+    }
+
+    const handleScroll = () => {
+      const belt = beltRef.current;
+      if (!belt) return;
+      // Stop any ongoing animation
+      animating.current = false;
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+      // Stop the belt immediately
+      belt.style.transition = 'none';
+      belt.style.transform = `rotate(-8deg) translateX(${beltScrollRef.current}px)`;
+      // When user stops scrolling, start the belt animation after debounce
+      scrollTimeout.current = setTimeout(() => {
+        const belt = beltRef.current;
+        if (!belt) return;
+        // Animate the belt to the right (or left)
+        animating.current = true;
+        const start = beltScrollRef.current;
+        const distance = 200; // px to move
+        const duration = 800; // ms
+        const startTime = performance.now();
+        belt.style.transition = 'none';
+        function animate(now: number) {
+          if (!animating.current) return;
+          const belt = beltRef.current;
+          if (!belt) return;
+          const elapsed = now - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const newX = start - distance * progress;
+          belt.style.transform = `rotate(-8deg) translateX(${newX}px)`;
+          beltScrollRef.current = newX;
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            animating.current = false;
+          }
+        }
+        requestAnimationFrame(animate);
+      }, 200);
+    };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -52,6 +106,28 @@ const LandingPage: React.FC = () => {
       question: "Can Lyra help with emotional support too?",
       answer: "Absolutely! Lyra offers three AI personas: Astrologer (wise & technical), Therapist (supportive & soft), and Friend (casual & encouraging). Each provides emotional support while incorporating your astrological profile for personalized guidance."
     }
+  ];
+
+  // Gradient backgrounds for each block
+  const blockGradients = [
+    'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+    'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)',
+    'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)',
+    'linear-gradient(135deg, #f9d423 0%, #ff4e50 100%)',
+    'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
+    'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
+    'linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)',
+    'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
+  ];
+  const blockLabels = [
+    'Natal Charts',
+    'Transits',
+    'Compatibility',
+    'Horoscopes',
+    'Aspects',
+    'Houses',
+    'Progressions',
+    'Returns',
   ];
 
   return (
@@ -117,8 +193,8 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Astrology Slaps Section */}
-      <section id="astrology" className="py-24 bg-gradient-to-b from-orange-50 to-orange-100">
-        <div className="max-w-7xl mx-auto px-8">
+      <section id="astrology" className="py-24 bg-white relative overflow-x-clip">
+        <div className="max-w-7xl mx-auto px-0">
           <motion.div 
             className="text-center mb-16"
             initial={{ opacity: 0, y: 50 }}
@@ -134,34 +210,52 @@ const LandingPage: React.FC = () => {
               and GPT-4o, ElevenLabs and Tavus intelligence for guidance that actually transforms your life.
             </p>
           </motion.div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 transform rotate-2">
-            {Array.from({ length: 8 }, (_, i) => (
-              <motion.div
-                key={i}
-                className="bg-white rounded-2xl border-2 border-black p-6 h-40 flex items-center justify-center hover:shadow-xl transition-all duration-300"
-                initial={{ opacity: 0, scale: 0.8, rotate: Math.random() * 10 - 5 }}
-                whileInView={{ opacity: 1, scale: 1, rotate: Math.random() * 6 - 3 }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ scale: 1.05, rotate: 0 }}
-              >
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary-orange to-yellow-400 rounded-full mx-auto mb-3 flex items-center justify-center">
-                    <span className="text-2xl">{['✨', '🔮', '⭐', '🌙', '☄️', '🪐', '🌟', '💫'][i]}</span>
-                  </div>
-                  <p className="font-semibold text-sm text-black">
-                    {['Natal Charts', 'Transits', 'Compatibility', 'Horoscopes', 'Aspects', 'Houses', 'Progressions', 'Returns'][i]}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
         </div>
+
+        {/* Single slanted, animated belt of 25 cards, edge-to-edge, seamless loop */}
+        <div className="absolute left-0 w-screen top-[340px] pointer-events-none select-none z-10">
+          <div
+            className="w-screen overflow-hidden pl-115 pr-0"
+            style={{
+              transform: 'rotate(-6deg)',
+              willChange: 'transform',
+              position: 'relative',
+            }}
+          >
+            {/* Calculate the width of one set of cards: 25 * (320px + 32px gap) = 8800px */}
+            <div className="flex gap-8 animate-belt-ltr -ml-16" style={{ width: '11980px' }}>
+              {/* Two sets of 25 cards for seamless loop */}
+              {Array.from({ length: 50 }).map((_, i) => (
+                <div
+                  key={`belt-card-${i}`}
+                  className="w-[340px] h-[220px] flex-shrink-0 flex-grow-0 overflow-hidden flex items-center justify-center rounded-2xl border-4 border-black text-3xl font-bold text-black shadow-lg bg-white"
+                  style={{
+                    background: blockGradients[i % blockGradients.length],
+                    boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)',
+                  }}
+                >
+                  {blockLabels[i % blockLabels.length]}
+                </div>
+              ))}
+            </div>
+          </div>
+          <style>{`
+            @keyframes belt-ltr {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-5840px); }
+            }
+            .animate-belt-ltr {
+              animation: belt-ltr 18s linear infinite;
+            }
+          `}</style>
+        </div>
+
+        {/* Add extra margin below the belt to push the next section down */}
+        <div className="mt-64" />
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-24 bg-gradient-to-b from-orange-100 to-orange-50">
+      {/* Features Section (Everything you need) - moved below the belt */}
+      <section id="features" className="py-24 bg-gradient-to-b from-orange-100 to-orange-50 relative z-10">
         <div className="max-w-7xl mx-auto px-8">
           <motion.div 
             className="text-center mb-16"
